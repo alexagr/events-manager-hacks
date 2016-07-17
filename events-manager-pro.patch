@@ -1,0 +1,48 @@
+--- events-manager-pro/add-ons/bookings-form/attendee-forms.php.old	2016-04-16 19:26:38.000000000 +0300
++++ events-manager-pro/add-ons/bookings-form/attendee-forms.php	2016-07-17 09:20:58.880147500 +0300
+@@ -330,6 +330,13 @@
+ 	 * @return boolean
+ 	 */
+ 	public static function em_booking_validate($result, $EM_Booking){
++		// alex: start
++		// skip validation for admin users
++		if (current_user_can( 'manage_options' )) {
++			return $result;
++		}
++		// alex: end
++
+ 		//going through each ticket type booked
+ 		$EM_Form = self::get_form($EM_Booking->event_id);
+ 		if( self::$form_id > 0 ){
+@@ -481,7 +488,10 @@
+ 		$EM_Tickets_Bookings = $EM_Booking->get_tickets_bookings();
+ 			$EM_Form = self::get_form($EM_Booking->event_id);
+ 			//validate a form for each space booked
+-			if( self::$form_id > 0 ){
++			// alex: start - hide attendee details for admin tickets
++			if( self::$form_id > 0 && !$EM_Ticket->ticket_members){
++			// if( self::$form_id > 0 && !$EM_Ticket->ticket_members){
++			// alex: end	
+ 				?>
+ 				<tr>
+ 				<td colspan="3" class="em-attendee-form-admin">
+--- events-manager-pro/gateways/gateways.transactions.php.old	2016-04-16 21:57:24.000000000 +0300
++++ events-manager-pro/gateways/gateways.transactions.php	2016-07-17 09:21:43.499609000 +0300
+@@ -7,7 +7,7 @@
+ 	function __construct(){
+ 		$this->order = ( !empty($_REQUEST ['order']) ) ? $_REQUEST ['order']:'ASC';
+ 		$this->orderby = ( !empty($_REQUEST ['order']) ) ? $_REQUEST ['order']:'booking_name';
+-		$this->limit = ( !empty($_REQUEST['limit']) ) ? $_REQUEST['limit'] : 20;//Default limit
++		$this->limit = ( !empty($_REQUEST['limit']) ) ? $_REQUEST['limit'] : 100;//Default limit
+ 		$this->page = ( !empty($_REQUEST['pno']) ) ? $_REQUEST['pno']:1;
+ 		$this->gateway = !empty($_REQUEST['gateway']) ? $_REQUEST['gateway']:false;
+ 		//Add options and tables to EM admin pages
+@@ -144,7 +144,7 @@
+ 						<option value="10">10</option>
+ 						<option value="25">25</option>
+ 						<option value="50">50</option>
+-						<option value="100">100</option>
++						<option value="100">200</option>
+ 					</select>
+ 					<select name="gateway">
+ 						<option value="">All</option>
