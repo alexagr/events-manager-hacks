@@ -18,3 +18,14 @@
  						</select>
  						<select name="status">
  							<?php
+--- events-manager/classes/em-tickets-bookings.php.old	2016-04-14 22:14:46.000000000 +0300
++++ events-manager/classes/em-tickets-bookings.php	2016-07-20 15:42:24.557778200 +0300
+@@ -34,7 +34,7 @@
+ 		if($object){
+ 			if( is_object($object) && get_class($object) == "EM_Booking"){
+ 				$this->booking = $object;
+-				$sql = "SELECT * FROM ". EM_TICKETS_BOOKINGS_TABLE ." WHERE booking_id ='{$this->booking->booking_id}'";
++				$sql = "SELECT * FROM ". EM_TICKETS_BOOKINGS_TABLE ." WHERE booking_id ='{$this->booking->booking_id}' ORDER BY ticket_id ASC";
+ 			}elseif( is_object($object) && get_class($object) == "EM_Ticket"){
+ 				$this->ticket = $object;
+ 				$sql = "SELECT * FROM ". EM_TICKETS_BOOKINGS_TABLE ." WHERE ticket_id ='{$this->ticket->ticket_id}'";
