@@ -106,3 +106,14 @@
  				}
  			}elseif($col == 'event_date'){
  				$val = $EM_Booking->get_event()->output('#_EVENTDATES');
+--- events-manager/em-actions.php.old	2017-04-30 09:05:27.517204300 +0300
++++ events-manager/em-actions.php	2017-04-30 09:05:59.030006700 +0300
+@@ -250,7 +250,7 @@
+ 		if ( $_REQUEST['action'] == 'booking_add') {
+ 			//ADD/EDIT Booking
+ 			ob_start();
+-			if( !defined('WP_CACHE') || !WP_CACHE ) em_verify_nonce('booking_add');
++			// if( !defined('WP_CACHE') || !WP_CACHE ) em_verify_nonce('booking_add');
+ 			if( !is_user_logged_in() || get_option('dbem_bookings_double') || !$EM_Event->get_bookings()->has_booking(get_current_user_id()) ){
+ 			    $EM_Booking->get_post();
+ 				$post_validation = $EM_Booking->validate();
