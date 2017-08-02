@@ -1,5 +1,5 @@
---- events-manager-pro/emp-forms.php.old	2016-04-12 13:57:26.000000000 +0300
-+++ events-manager-pro/emp-forms.php	2017-04-27 17:56:17.274408200 +0300
+--- events-manager-pro/emp-forms.php.old	2017-08-02 12:18:16.091296100 +0300
++++ events-manager-pro/emp-forms.php	2017-08-02 12:18:15.991438000 +0300
 @@ -100,6 +100,17 @@
  			}
  			if( !is_array($_REQUEST[$fieldid])){
@@ -18,25 +18,38 @@
  			}elseif( is_array($_REQUEST[$fieldid])){
  			    $array = array();
  			    foreach( $_REQUEST[$fieldid] as $key => $array_value ){
-@@ -559,6 +570,10 @@
+@@ -231,7 +242,11 @@
+ 		$required = ( !empty($field['required']) ) ? ' '.apply_filters('emp_forms_output_field_required','<span class="em-form-required">*</span>'):'';
+ 		switch($field['type']){
+ 			case 'html':
+-			     echo $this->output_field_input($field, $post);
++				?>
++                <p name="<?php echo $field['fieldid']; ?>">
++				<?php echo $this->output_field_input($field, $post); ?>
++                </p>
++				<?php
+ 			     break;
+ 			case 'text':
+ 			case 'textarea':
+@@ -559,6 +574,10 @@
  		$field = array_key_exists($field_id, $this->form_fields) ? $this->form_fields[$field_id]:false;
  		$value = (is_array($value)) ? $value:trim($value);
  		$err = sprintf($this->form_required_error, $field['label']);
 +        // alex: start
-+        $err = sprintf(__('[:ru]Пожалуйста, заполните поле[:he]נא למלא שדה[:]: %s', 'em-pro'), $field['label']); 
++        $err = sprintf(__('[:ru]Заполните поле[:he]נא למלא שדה[:]: %s', 'em-pro'), $field['label']); 
 +        $err = __( $err, 'em-pro');
 +        // alex: end
  		if( is_array($field) ){
  			$result = true; //innocent until proven guilty
  			switch($field['type']){
-@@ -757,7 +772,10 @@
+@@ -757,7 +776,10 @@
  						//add field-specific validation
  						if ( $field['type'] == 'user_email' ) {
  							if( ! is_email( $value ) ){
 -								$this->add_error( __emp( '<strong>ERROR</strong>: The email address isn&#8217;t correct.', 'events-manager') );
 +								// alex - start
 +								// $this->add_error( __emp( '<strong>ERROR</strong>: The email address isn&#8217;t correct.', 'events-manager') );
-+								$this->add_error( __emp( '[:ru]Пожалуйста, введите правильный E-mail адрес[:he]נא למלא כתובת דוא"ל חוקית[:]', 'events-manager') );
++								$this->add_error( __emp( '[:ru]Введите правильный E-mail адрес[:he]נא למלא כתובת דוא"ל חוקית[:]', 'events-manager') );
 +								// alex - end
  								$result = false;
  							}elseif( is_user_logged_in() ){
@@ -77,6 +90,17 @@
  		//going through each ticket type booked
  		$EM_Form = self::get_form($EM_Booking->event_id);
  		if( self::$form_id > 0 ){
+@@ -350,8 +357,8 @@
+ 						}
+ 						//validate and save errors within this ticket user
+ 						if( !$EM_Form->validate() ){
+-							$title = $EM_Ticket_Booking->get_ticket()->ticket_name . " - " . sprintf(__('Attendee %s','em-pro'), $i+1);
+-							$error = array( $title => $EM_Form->get_errors());
++							$title = __($EM_Ticket_Booking->get_ticket()->ticket_name, 'em-pro') . " - " . sprintf(__('[:en]Attendee[:ru]Место[:he]מקום[:] #%s','em-pro'), $i+1);
++							$error = array( $title => __($EM_Form->get_errors(), 'em-pro'));
+ 						    $EM_Booking->add_error($error);
+ 						    $result = false;
+ 						}
 @@ -481,7 +488,10 @@
  		$EM_Tickets_Bookings = $EM_Booking->get_tickets_bookings();
  			$EM_Form = self::get_form($EM_Booking->event_id);
