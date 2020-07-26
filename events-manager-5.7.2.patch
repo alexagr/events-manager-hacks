@@ -117,3 +117,17 @@
  			if( !is_user_logged_in() || get_option('dbem_bookings_double') || !$EM_Event->get_bookings()->has_booking(get_current_user_id()) ){
  			    $EM_Booking->get_post();
  				$post_validation = $EM_Booking->validate();
+--- em-booking.php.old  2018-07-26 09:11:19.820381400 +0300
++++ em-booking.php      2018-07-26 09:04:22.319635100 +0300
+@@ -947,9 +947,9 @@
+         * @param string $note
+         * @return mixed
+         */
+-       function add_note( $note_text ){
++       function add_note( $note_text, $force = false ){
+                global $wpdb;
+-               if( $this->can_manage() ){
++               if( $force || $this->can_manage() ){
+                        $this->get_notes();
+                        $note = array('author'=>get_current_user_id(),'note'=>$note_text,'timestamp'=>current_time('timestamp'));
+                        $this->notes[] = wp_kses_data($note);

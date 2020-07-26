@@ -1,0 +1,119 @@
+--- events-manager/admin/em-bookings.php.orig	2020-02-05 16:07:06.000000000 +0200
++++ events-manager/admin/em-bookings.php	2020-07-26 09:51:00.240955700 +0300
+@@ -83,7 +83,7 @@
+ 	?>
+ 	<div class='wrap'>
+ 		<?php if( is_admin() ): ?><h1 class="wp-heading-inline"><?php else: ?><h2><?php endif; ?>		
+-  			<?php echo sprintf(__('Manage %s Bookings', 'events-manager'), "'{$EM_Event->event_name}'"); ?>
++  			<?php echo apply_filters('translate_text', sprintf(__('Manage %s Bookings', 'events-manager'), "'{$EM_Event->event_name}'"), 'ru'); ?>
+   		<?php if( is_admin() ): ?></h1><?php endif; ?>
+   			<a href="<?php echo $EM_Event->get_permalink(); ?>" class="<?php echo $header_button_classes; ?>"><?php echo sprintf(__('View %s','events-manager'), __('Event', 'events-manager')) ?></a>
+   			<a href="<?php echo $EM_Event->get_edit_url(); ?>" class="<?php echo $header_button_classes; ?>"><?php echo sprintf(__('Edit %s','events-manager'), __('Event', 'events-manager')) ?></a>
+@@ -94,7 +94,7 @@
+ 		<?php if( !is_admin() ): ?></h2><?php else: ?><hr class="wp-header-end" /><?php endif; ?>
+   		<?php if( !is_admin() ) echo $EM_Notices; ?>  
+ 		<div>
+-			<p><strong><?php esc_html_e('Event Name','events-manager'); ?></strong> : <?php echo esc_html($EM_Event->event_name); ?></p>
++			<p><strong><?php esc_html_e('Event Name','events-manager'); ?></strong> : <?php echo esc_html(apply_filters('translate_text', $EM_Event->event_name, 'ru')); ?></p>
+ 			<p>
+ 				<strong><?php esc_html_e('Availability','events-manager'); ?></strong> : 
+ 				<?php echo $EM_Event->get_bookings()->get_booked_spaces() . '/'. $EM_Event->get_spaces() ." ". __('Spaces confirmed','events-manager'); ?>
+@@ -143,7 +143,7 @@
+ 	?>
+ 	<div class='wrap'>
+ 		<?php if( is_admin() ): ?><h1 class="wp-heading-inline"><?php else: ?><h2><?php endif; ?>
+-  			<?php echo sprintf(__('Ticket for %s', 'events-manager'), "'{$EM_Event->name}'"); ?>
++  			<?php echo apply_filters('translate_text', sprintf(__('Ticket for %s', 'events-manager'), "'{$EM_Event->name}'"), 'ru'); ?>
+   		<?php if( is_admin() ): ?></h1><?php endif; ?>
+   			<a href="<?php echo $EM_Event->get_edit_url(); ?>" class="<?php echo $header_button_classes; ?>"><?php esc_html_e('View/Edit Event','events-manager') ?></a>
+   			<a href="<?php echo $EM_Event->get_bookings_url(); ?>" class="<?php echo $header_button_classes; ?>"><?php esc_html_e('View Event Bookings','events-manager') ?></a>
+@@ -152,7 +152,7 @@
+   		<?php if( !is_admin() ) echo $EM_Notices; ?>
+ 		<div>
+ 			<table>
+-				<tr><td><?php echo __('Name','events-manager'); ?></td><td></td><td><?php echo $EM_Ticket->ticket_name; ?></td></tr>
++				<tr><td><?php echo __('Name','events-manager'); ?></td><td></td><td><?php echo apply_filters('translate_text', $EM_Ticket->ticket_name, 'ru'); ?></td></tr>
+ 				<tr><td><?php echo __('Description','events-manager'); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td></td><td><?php echo ($EM_Ticket->ticket_description) ? $EM_Ticket->ticket_description : '-'; ?></td></tr>
+ 				<tr><td><?php echo __('Price','events-manager'); ?></td><td></td><td><?php echo ($EM_Ticket->ticket_price) ? $EM_Ticket->ticket_price : '-'; ?></td></tr>
+ 				<tr><td><?php echo __('Spaces','events-manager'); ?></td><td></td><td><?php echo ($EM_Ticket->ticket_spaces) ? $EM_Ticket->ticket_spaces : '-'; ?></td></tr>
+@@ -203,7 +203,7 @@
+ 						$EM_Event = $EM_Booking->get_event();
+ 						?>
+ 						<table>
+-							<tr><td><strong><?php esc_html_e('Name','events-manager'); ?></strong></td><td><a class="row-title" href="<?php echo $EM_Event->get_bookings_url(); ?>"><?php echo ($EM_Event->event_name); ?></a></td></tr>
++							<tr><td><strong><?php esc_html_e('Name','events-manager'); ?></strong></td><td><a class="row-title" href="<?php echo $EM_Event->get_bookings_url(); ?>"><?php echo apply_filters('translate_text', $EM_Event->event_name, 'ru'); ?></a></td></tr>
+ 							<tr>
+ 								<td><strong><?php esc_html_e('Date/Time','events-manager'); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>
+ 								<td>
+@@ -303,7 +303,7 @@
+ 								<tbody>
+ 									<?php foreach($EM_Booking->get_tickets_bookings()->tickets_bookings as $EM_Ticket_Booking): /* @var $EM_Ticket_Booking EM_Ticket_Booking */ ?>
+ 									<tr>
+-										<td class="ticket-type"><a class="row-title" href="<?php echo em_add_get_params($EM_Event->get_bookings_url(), array('ticket_id'=>$EM_Ticket_Booking->ticket_id)); ?>"><?php echo $EM_Ticket_Booking->get_ticket()->ticket_name ?></a></td>
++										<td class="ticket-type"><a class="row-title" href="<?php echo em_add_get_params($EM_Event->get_bookings_url(), array('ticket_id'=>$EM_Ticket_Booking->ticket_id)); ?>"><?php echo apply_filters('translate_text', $EM_Ticket_Booking->get_ticket()->ticket_name, 'ru'); ?></a></td>
+ 										<td>
+ 											<span class="em-booking-single-info"><?php echo $EM_Ticket_Booking->get_spaces(); ?></span>
+ 											<div class="em-booking-single-edit"><input name="em_tickets[<?php echo $EM_Ticket_Booking->ticket_id; ?>][spaces]" class="em-ticket-select" id="em-ticket-spaces-<?php echo $EM_Ticket_Booking->ticket_id; ?>" value="<?php echo $EM_Ticket_Booking->get_spaces(); ?>" /></div>
+@@ -319,7 +319,7 @@
+ 										<?php foreach($EM_Event->get_bookings()->get_tickets()->tickets as $EM_Ticket): /* @var $EM_Ticket EM_Ticket */ ?>
+ 											<?php if( !in_array($EM_Ticket->ticket_id, $shown_tickets) ): ?>
+ 											<tr>
+-												<td class="ticket-type"><a class="row-title" href="<?php echo em_add_get_params($EM_Event->get_bookings_url(), array('ticket_id'=>$EM_Ticket->ticket_id)); ?>"><?php echo $EM_Ticket->ticket_name ?></a></td>
++												<td class="ticket-type"><a class="row-title" href="<?php echo em_add_get_params($EM_Event->get_bookings_url(), array('ticket_id'=>$EM_Ticket->ticket_id)); ?>"><?php echo apply_filters('translate_text', $EM_Ticket->ticket_name, 'ru'); ?></a></td>
+ 												<td>
+ 													<span class="em-booking-single-info">0</span>
+ 													<div class="em-booking-single-edit"><input name="em_tickets[<?php echo $EM_Ticket->ticket_id; ?>][spaces]" class="em-ticket-select" id="em-ticket-spaces-<?php echo $EM_Ticket->ticket_id; ?>" value="0" /></div>
+--- events-manager/admin/bookings/em-events.php.orig	2017-12-13 16:38:32.000000000 +0200
++++ events-manager/admin/bookings/em-events.php	2020-07-23 14:41:02.362148200 +0300
+@@ -110,7 +110,7 @@
+ 						<tr <?php echo "$class $style"; ?>>
+ 							<td>
+ 								<strong>
+-									<?php echo $EM_Event->output('#_BOOKINGSLINK'); ?>
++									<?php echo apply_filters('translate_text', $EM_Event->output('#_BOOKINGSLINK'), 'ru'); ?>
+ 								</strong>
+ 								&ndash; 
+ 								<?php esc_html_e("Booked Spaces",'events-manager') ?>: <?php echo $EM_Event->get_bookings()->get_booked_spaces()."/".$EM_Event->get_spaces() ?>
+--- events-manager/classes/em-bookings-table.php.orig	2020-07-26 09:54:28.774981000 +0300
++++ events-manager/classes/em-bookings-table.php	2020-07-26 09:54:31.949756100 +0300
+@@ -67,7 +67,7 @@
+ 		//Set basic vars
+ 		$this->order = ( !empty($_REQUEST ['order']) && $_REQUEST ['order'] == 'DESC' ) ? 'DESC':'ASC';
+ 		$this->orderby = ( !empty($_REQUEST ['orderby']) ) ? sanitize_sql_orderby($_REQUEST['orderby']):'booking_name';
+-		$this->limit = ( !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit'])) ? $_REQUEST['limit'] : 20;//Default limit
++		$this->limit = ( !empty($_REQUEST['limit']) && is_numeric($_REQUEST['limit'])) ? $_REQUEST['limit'] : 100;//Default limit
+ 		$this->page = ( !empty($_REQUEST['pno']) && is_numeric($_REQUEST['pno']) ) ? $_REQUEST['pno']:1;
+ 		$this->offset = ( $this->page > 1 ) ? ($this->page-1)*$this->limit : 0;
+ 		$this->scope = ( !empty($_REQUEST['scope']) && array_key_exists($_REQUEST ['scope'], em_get_scopes()) ) ? sanitize_text_field($_REQUEST['scope']):'future';
+@@ -398,7 +398,7 @@
+ 						<input name="pno" type="hidden" value="1" />
+ 						<input id="post-query-submit" class="button-secondary" type="submit" value="<?php esc_attr_e( 'Filter' )?>" />
+ 						<?php if( $EM_Event !== false ): ?>
+-						<?php esc_html_e('Displaying Event','events-manager'); ?> : <?php echo esc_html($EM_Event->event_name); ?>
++						<?php esc_html_e('Displaying Event','events-manager'); ?> : <?php echo esc_html(apply_filters('translate_text', $EM_Event->event_name, 'ru')); ?>
+ 						<?php elseif( $EM_Person !== false ): ?>
+ 						<?php esc_html_e('Displaying User','events-manager'); echo ' : '.esc_html($EM_Person->get_name()); ?>
+ 						<?php endif; ?>
+@@ -553,9 +553,9 @@
+ 				$val = $EM_Booking->get_person()->last_name;
+ 			}elseif($col == 'event_name'){
+ 				if( $format == 'csv' ){
+-					$val = $EM_Booking->get_event()->event_name;
++					$val = apply_filters('translate_text', $EM_Booking->get_event()->event_name, 'ru');
+ 				}else{
+-					$val = '<a href="'.$EM_Booking->get_event()->get_bookings_url().'">'. esc_html($EM_Booking->get_event()->event_name) .'</a>';
++					$val = '<a href="'.$EM_Booking->get_event()->get_bookings_url().'">'. esc_html(apply_filters('translate_text', $EM_Booking->get_event()->event_name, 'ru')) .'</a>';
+ 				}
+ 			}elseif($col == 'event_date'){
+ 				$val = $EM_Booking->get_event()->output('#_EVENTDATES');
+--- events-manager/em-actions.php.orig	2020-07-26 09:50:14.852242800 +0300
++++ events-manager/em-actions.php	2020-07-25 22:56:30.270326800 +0300
+@@ -282,7 +282,7 @@
+ 		if ( $_REQUEST['action'] == 'booking_add') {
+ 			//ADD/EDIT Booking
+ 			ob_start();
+-			if( (!defined('WP_CACHE') || !WP_CACHE) && !isset($GLOBALS["wp_fastest_cache"]) ) em_verify_nonce('booking_add');
++			// if( (!defined('WP_CACHE') || !WP_CACHE) && !isset($GLOBALS["wp_fastest_cache"]) ) em_verify_nonce('booking_add');
+ 			if( !is_user_logged_in() || get_option('dbem_bookings_double') || !$EM_Event->get_bookings()->has_booking(get_current_user_id()) ){
+ 			    $EM_Booking->get_post();
+ 				$post_validation = $EM_Booking->validate();

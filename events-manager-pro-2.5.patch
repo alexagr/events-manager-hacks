@@ -1,0 +1,187 @@
+--- events-manager-pro/emp-forms.php.orig	2020-07-26 09:57:20.873061500 +0300
++++ events-manager-pro/emp-forms.php	2020-07-26 10:22:29.750548900 +0300
+@@ -143,6 +143,17 @@
+ 			}
+ 			if( !is_array($_REQUEST[$fieldid])){
+ 				$this->field_values[$fieldid] = wp_kses_data(stripslashes($_REQUEST[$fieldid]));
++				// alex - start
++				// select value gets submitted in a single language - hence need to modify the validation
++				if ($field['type'] == 'select') {
++					$values = explode("\r\n",$field['options_select_values']);
++					foreach($values as $k => $v) {
++                		if (($this->field_values[$fieldid] == apply_filters('translate_text', $v, 'ru')) || ($this->field_values[$fieldid] == apply_filters('translate_text', $v, 'he'))) {
++                	    	$this->field_values[$fieldid] = $v;
++                		}
++                	}
++                }
++				// alex - end 
+ 			}elseif( is_array($_REQUEST[$fieldid])){
+ 			    $array = array();
+ 			    foreach( $_REQUEST[$fieldid] as $key => $array_value ){
+@@ -275,8 +286,14 @@
+ 		$field = $this->translate_field($field);
+ 		switch($field['type']){
+ 			case 'html':
+-			     echo $this->output_field_input($field, $post);
+-			     break;
++				// alex: start
++				?>
++				<p name="<?php echo $field['fieldid']; ?>">
++				<?php echo $this->output_field_input($field, $post); ?>
++				</p>
++				<?php
++				// alex: end
++				break;
+ 			case 'text':
+ 			case 'textarea':
+ 			case 'checkbox':
+@@ -603,7 +620,11 @@
+ 		$field = array_key_exists($field_id, $this->form_fields) ? $this->form_fields[$field_id]:false;
+ 		$field = $this->translate_field($field);
+ 		$value = (is_array($value)) ? $value:trim($value);
+-		$err = sprintf($this->form_required_error, $field['label']);
++		// alex: start
++		// $err = sprintf($this->form_required_error, $field['label']);
++		$err = sprintf(__('[:ru]Заполните поле[:he]נא למלא שדה[:]: %s', 'em-pro'), $field['label']);
++		$err = __( $err, 'em-pro');
++		// alex: end		
+ 		if( is_array($field) ){
+ 			$result = true; //innocent until proven guilty
+ 			switch($field['type']){
+@@ -802,7 +823,11 @@
+ 						//add field-specific validation
+ 						if ( $field['type'] == 'user_email' ) {
+ 							if( ! is_email( $value ) ){
+-								$this->add_error( emp__( '<strong>ERROR</strong>: The email address isn&#8217;t correct.', 'events-manager') );
++								// alex - start
++								// $this->add_error( emp__( '<strong>ERROR</strong>: The email address isn&#8217;t correct.', 'events-manager') );
++								$this->add_error( __emp( '[:ru]Введите правильный E-mail адрес[:he]נא למלא כתובת דוא"ל חוקית[:]', 'events-manager') );
++								// alex - end
++
+ 								$result = false;
+ 							}elseif( is_user_logged_in() ){
+ 								$email_exists = email_exists($value);
+--- events-manager-pro/add-ons/bookings-form/attendee-form.php.orig	2020-07-26 09:58:53.019316000 +0300
++++ events-manager-pro/add-ons/bookings-form/attendee-form.php	2020-07-26 10:11:01.107998800 +0300
+@@ -25,6 +25,17 @@
+     		if( isset($_REQUEST['em_attendee_fields'][$ticket_id][$fieldid][$attendee_index]) && $_REQUEST['em_attendee_fields'][$ticket_id][$fieldid][$attendee_index] != '' ){
+     			if( !is_array($_REQUEST['em_attendee_fields'][$ticket_id][$fieldid][$attendee_index])){
+     				$this->field_values[$fieldid] = wp_kses_data(stripslashes($_REQUEST['em_attendee_fields'][$ticket_id][$fieldid][$attendee_index]));
++					// alex - start
++					if ($field['type'] == 'select') {
++						// select value gets submitted in a single language - hence need to modify the validation
++						$values = explode("\r\n",$field['options_select_values']);
++						foreach($values as $k => $v) {
++							if (($this->field_values[$fieldid] == apply_filters('translate_text', $v, 'ru')) || ($this->field_values[$fieldid] == apply_filters('translate_text', $v, 'he'))) {
++								$this->field_values[$fieldid] = $v;
++							}
++						}
++					}
++					// alex - end
+     			}elseif( is_array($_REQUEST['em_attendee_fields'][$ticket_id][$fieldid][$attendee_index])){
+     				$this->field_values[$fieldid] = $_REQUEST['em_attendee_fields'][$ticket_id][$fieldid][$attendee_index];
+     			}
+--- events-manager-pro/add-ons/bookings-form/attendee-forms.php.orig	2020-07-26 09:58:53.105501100 +0300
++++ events-manager-pro/add-ons/bookings-form/attendee-forms.php	2020-07-26 10:29:26.742628700 +0300
+@@ -333,6 +333,13 @@
+ 	 * @return boolean
+ 	 */
+ 	public static function em_booking_validate($result, $EM_Booking){
++		// alex: start
++		// skip validation for admin users
++		if (current_user_can( 'manage_options' )) {
++			return $result;
++		}
++		// alex: end
++
+ 		//going through each ticket type booked
+ 		$EM_Form = self::get_form($EM_Booking->event_id);
+ 		if( self::$form_id > 0 ){
+@@ -353,8 +360,8 @@
+ 						}
+ 						//validate and save errors within this ticket user
+ 						if( !$EM_Form->validate() ){
+-							$title = $EM_Ticket_Booking->get_ticket()->ticket_name . " - " . sprintf(__('Attendee %s','em-pro'), $i+1);
+-							$error = array( $title => $EM_Form->get_errors());
++							$title = __($EM_Ticket_Booking->get_ticket()->ticket_name, 'em-pro') . " - " . sprintf(__('[:en]Attendee[:ru]Место[:he]מקום[:] #%s','em-pro'), $i+1);
++							$error = array( $title => __($EM_Form->get_errors(), 'em-pro'));
+ 						    $EM_Booking->add_error($error);
+ 						    $result = false;
+ 						}
+@@ -484,7 +491,10 @@
+ 		$EM_Tickets_Bookings = $EM_Booking->get_tickets_bookings();
+ 			$EM_Form = self::get_form($EM_Booking->event_id);
+ 			//validate a form for each space booked
+-			if( self::$form_id > 0 ){
++			// alex: start - hide attendee details for admin tickets
++			// if( self::$form_id > 0 ){
++			if( self::$form_id > 0 && ($EM_Ticket->ticket_price < 1)){
++			// alex: end	
+ 				?>
+ 				<tr>
+ 				<td colspan="3" class="em-attendee-form-admin">
+@@ -504,11 +514,11 @@
+ 								}
+ 								?>
+ 								<div class="em-booking-single-info">
+-									<h4><?php echo $attendee_title; ?></h4>
++									<h4><?php echo apply_filters('translate_text', $attendee_title, 'ru'); ?></h4>
+ 									<?php foreach( $attendee_data as $attendee_label => $attendee_value): ?>
+ 									<p>
+-										<label><?php echo $attendee_label ?></label>
+-										<span><?php echo $attendee_value; ?></span>
++										<label><?php echo apply_filters('translate_text', $attendee_label, 'ru'); ?></label>
++										<span><?php echo apply_filters('translate_text', $attendee_value, 'ru'); ?></span>
+ 									</p>
+ 									<?php endforeach; ?>
+ 								</div>
+@@ -577,11 +587,11 @@
+ 			if( !array_key_exists($fieldid, $EM_Form->user_fields) && $field['type'] != 'html' ){
+ 				?>
+ 				<tr class="input-group input-<?php echo $field['type']; ?> input-field-<?php echo $field['fieldid'] ?>">
+-					<th><?php echo $field['label'] ?></th>
++					<th><?php echo apply_filters('translate_text', $field['label'], 'ru'); ?></th>
+ 					<td>
+ 					<?php
+ 						$value = !empty($EM_Form->field_values[$fieldid]) ? $EM_Form->field_values[$fieldid]:''; 
+-						echo str_replace('%T', $ticket_id, $EM_Form->output_field_input($field, $value)); 
++						echo str_replace('%T', $ticket_id, apply_filters('translate_text', $EM_Form->output_field_input($field, $value), 'ru')); 
+ 					?>
+ 					</td>
+ 				</tr>
+--- events-manager-pro/add-ons/bookings-form/bookings-form.php.orig	2020-07-26 09:58:53.189586500 +0300
++++ events-manager-pro/add-ons/bookings-form/bookings-form.php	2020-07-23 15:52:22.748145800 +0300
+@@ -379,10 +379,10 @@
+ 				if( $input_value == 'n/a' ) $input_value = '';
+ 				?>
+ 				<tr>
+-					<th><?php echo $field['label'] ?></th>
++					<th><?php echo apply_filters('translate_text', $field['label'], 'ru'); ?></th>
+ 					<td>
+-						<span class="em-booking-single-info"><?php echo $EM_Form->get_formatted_value($field, $field_value); ?></span>
+-						<div class="em-booking-single-edit"><?php echo $EM_Form->output_field_input($field, $input_value)?></div>
++						<span class="em-booking-single-info"><?php echo apply_filters('translate_text', $EM_Form->get_formatted_value($field, $field_value), 'ru'); ?></span>
++						<div class="em-booking-single-edit"><?php echo apply_filters('translate_text', $EM_Form->output_field_input($field, $input_value), 'ru'); ?></div>
+ 					</td>
+ 				</tr>
+ 				<?php
+--- events-manager-pro/add-ons/gateways/gateways.transactions.php.orig	2020-07-26 10:12:51.457560300 +0300
++++ events-manager-pro/add-ons/gateways/gateways.transactions.php	2020-07-26 10:28:07.106422400 +0300
+@@ -7,7 +7,7 @@
+ 	function __construct(){
+ 		$this->order = ( !empty($_REQUEST ['order']) ) ? $_REQUEST ['order']:'ASC';
+ 		$this->orderby = ( !empty($_REQUEST ['order']) ) ? $_REQUEST ['order']:'booking_name';
+-		$this->limit = ( !empty($_REQUEST['limit']) ) ? $_REQUEST['limit'] : 20;//Default limit
++		$this->limit = ( !empty($_REQUEST['limit']) ) ? $_REQUEST['limit'] : 100;//Default limit
+ 		$this->page = ( !empty($_REQUEST['pno']) ) ? $_REQUEST['pno']:1;
+ 		$this->gateway = !empty($_REQUEST['gateway']) ? $_REQUEST['gateway']:false;
+ 		//Add options and tables to EM admin pages
+@@ -174,7 +174,7 @@
+ 					</select>
+ 					<input id="post-query-submit" class="button-secondary" type="submit" value="<?php _e ( 'Filter' )?>" />
+ 					<?php if( is_object($context) && get_class($context)=="EM_Event" ): ?>
+-					<?php esc_html_e_emp('Displaying Event','events-manager'); ?> : <?php echo $context->event_name; ?>
++					<?php esc_html_e_emp('Displaying Event','events-manager'); ?> : <?php echo apply_filters('translate_text', $context->event_name, 'ru'); ?>
+ 					<?php elseif( is_object($context) && get_class($context)=="EM_Person" ): ?>
+ 					<?php esc_html_e_emp('Displaying User','events-manager'); echo ' : '.$context->get_name(); ?>
+ 					<?php endif; ?>
