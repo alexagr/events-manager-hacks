@@ -1,11 +1,11 @@
 --- events-manager-pro/emp-forms.php.orig	2020-07-26 09:57:20.873061500 +0300
-+++ events-manager-pro/emp-forms.php	2020-07-26 10:22:29.750548900 +0300
++++ events-manager-pro/emp-forms.php	2020-07-26 11:34:51.404259700 +0300
 @@ -143,6 +143,17 @@
  			}
  			if( !is_array($_REQUEST[$fieldid])){
  				$this->field_values[$fieldid] = wp_kses_data(stripslashes($_REQUEST[$fieldid]));
 +				// alex - start
-+				// select value gets submitted in a single language - hence need to modify the validation
++                // select value gets submitted in a single language - hence need to modify the validation
 +				if ($field['type'] == 'select') {
 +					$values = explode("\r\n",$field['options_select_values']);
 +					foreach($values as $k => $v) {
@@ -13,51 +13,46 @@
 +                	    	$this->field_values[$fieldid] = $v;
 +                		}
 +                	}
-+                }
-+				// alex - end 
++				}
++				// alex - end
  			}elseif( is_array($_REQUEST[$fieldid])){
  			    $array = array();
  			    foreach( $_REQUEST[$fieldid] as $key => $array_value ){
-@@ -275,8 +286,14 @@
+@@ -275,7 +286,13 @@
  		$field = $this->translate_field($field);
  		switch($field['type']){
  			case 'html':
 -			     echo $this->output_field_input($field, $post);
--			     break;
-+				// alex: start
-+				?>
-+				<p name="<?php echo $field['fieldid']; ?>">
-+				<?php echo $this->output_field_input($field, $post); ?>
-+				</p>
-+				<?php
-+				// alex: end
-+				break;
++			     // alex - start
++				 // echo $this->output_field_input($field, $post);
++				 ?>
++                 <p name="<?php echo $field['fieldid']; ?>">
++				 <?php echo $this->output_field_input($field, $post); ?>
++                 </p>
++				 <?php
+ 			     break;
  			case 'text':
  			case 'textarea':
- 			case 'checkbox':
-@@ -603,7 +620,11 @@
- 		$field = array_key_exists($field_id, $this->form_fields) ? $this->form_fields[$field_id]:false;
+@@ -604,6 +621,10 @@
  		$field = $this->translate_field($field);
  		$value = (is_array($value)) ? $value:trim($value);
--		$err = sprintf($this->form_required_error, $field['label']);
-+		// alex: start
-+		// $err = sprintf($this->form_required_error, $field['label']);
-+		$err = sprintf(__('[:ru]Заполните поле[:he]נא למלא שדה[:]: %s', 'em-pro'), $field['label']);
-+		$err = __( $err, 'em-pro');
-+		// alex: end		
+ 		$err = sprintf($this->form_required_error, $field['label']);
++        // alex - start
++        $err = emp__(sprintf('[:ru]Заполните поле[:he]נא למלא שדה[:]: %s', $field['label'])); 
++        // alex - end
++
  		if( is_array($field) ){
  			$result = true; //innocent until proven guilty
  			switch($field['type']){
-@@ -802,7 +823,11 @@
+@@ -802,7 +823,10 @@
  						//add field-specific validation
  						if ( $field['type'] == 'user_email' ) {
  							if( ! is_email( $value ) ){
 -								$this->add_error( emp__( '<strong>ERROR</strong>: The email address isn&#8217;t correct.', 'events-manager') );
 +								// alex - start
 +								// $this->add_error( emp__( '<strong>ERROR</strong>: The email address isn&#8217;t correct.', 'events-manager') );
-+								$this->add_error( __emp( '[:ru]Введите правильный E-mail адрес[:he]נא למלא כתובת דוא"ל חוקית[:]', 'events-manager') );
++								$this->add_error( emp__( '[:ru]Введите правильный E-mail адрес[:he]נא למלא כתובת דוא"ל חוקית[:]', 'events-manager') );
 +								// alex - end
-+
  								$result = false;
  							}elseif( is_user_logged_in() ){
  								$email_exists = email_exists($value);
